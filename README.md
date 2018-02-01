@@ -1,4 +1,4 @@
-# smart_insurance_api
+# Smart Insurance API
 
 ## Requirements
 - Python 3
