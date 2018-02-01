@@ -4,11 +4,21 @@
     "uri": "mongodb://localhost:27017",
     "name": "heroku_5tx5cd30"
   },
+  "tables": {
+    "basicUserData": "basicUserData",
+    "rawUserData": "rawUserData",
+    "insurerData": "insurerData"
+  },
   "variables": {
     "basic_data_fields": [
       "username", "password", "first_name",
       "middle_name", "last_name", "email", "birthday", "gender",
-      "geolocation", "address", "products", "quotes"
+      "country", "province", "city", "postal_code", "street_name",
+      "house_number", "geolocation", "products", "quotes", "relationships",
+      "currency"
+    ],
+    "insurer_data_fields": [
+      "insurer_name", "insurer_id", "products"
     ],
     "raw_data_fields": ["username"],
     "normalized_data_fields": ["username"]
