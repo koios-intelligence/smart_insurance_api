@@ -7,8 +7,10 @@ def check_pw(password):
     """
     Check whether the password
     string entered is in concordance
-    with some specified standards
-
+    with some defined standards
+    e.g. alphanumerical characters, at least
+        one cap, etc. 
+        
     :param password:
         String
     :return:
