@@ -11,6 +11,11 @@ with open('config.json') as json_data_file:
 base_url = '/api/v' + config['version']
 basic_data_fields = config['variables']['basic_data_fields']
 raw_data_fields = config['variables']['raw_data_fields']
+insurer_data_fields = config['variables']['insurer_data_fields']
+
+insurerData = config['tables']['insurerData']
+rawUserData = config['tables']['rawUserData']
+basicUserData = config['tables']['basicUserData']
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -125,7 +130,7 @@ def update_basic_data():
     authentication = User().verify_password(password, username)
 
     if authentication:
-        success = DataBase().update_db('users',
+        success = DataBase().update_db(basicUserData,
                                        key={'username': username},
                                        field=fields,
                                        value=values)
@@ -177,7 +182,7 @@ def get_basic_data():
     authentication = User().verify_password(password, username)
 
     if authentication:
-        fetched_data = DataBase().find('users',
+        fetched_data = DataBase().find(basicUserData,
                                        key={'username': username})
         if fetched_data is not None:
             data = {fields[i]: fetched_data[fields[i]]
@@ -233,7 +238,122 @@ def update_raw_data():
     authentication = User().verify_password(password, username)
 
     if authentication:
-        success = DataBase().update_db('raw_data',
+        success = DataBase().update_db(rawUserData,
+                                       key={'username': username},
+                                       field=fields,
+                                       value=values)
+        return jsonify({'success': success})
+
+    else:
+        # Unauthorized user
+        abort(401)
+
+
+@app.route(base_url + '/getInsurerData/', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def get_insurer_data():
+    """
+    Fetch Insurer's data
+    __________________________________________________
+    POST request example:
+    curl -H "Content-Type: application/json" -X GET -d
+    '{"username": "test", "password": "test", "fields":
+    ["middle_name"], "values":["J."]}'
+    http://localhost:5000/api/v1.0/getInsurerData/
+    ___________________________________________________
+
+    :GET body:
+        {
+            'username': 'user',
+            'password': 'pw',
+            'fields': [
+                    'field 1',
+                        ...,
+                    'field n'
+                ]
+        }
+
+    :return:
+        JSON response
+        {
+            'success': Boolean,
+            'data': [
+                'field 1': 'value 1',
+                        ...,
+                'field n': 'value n'
+            ]
+        }
+    """
+    request_body = request.get_json()
+    username = request_body['username']
+    password = request_body['password']
+    fields = request_body['fields']
+
+    # Check if the fields are accessible
+    if not all([field in insurer_data_fields for field in fields]):
+        # bad request
+        abort(400)
+
+    authentication = User().verify_password(password, username)
+
+    if authentication:
+        fetched_data = DataBase().find(insurerData,
+                                       key={'username': username})
+        if fetched_data is not None:
+            data = {fields[i]: fetched_data[fields[i]]
+                    for i in range(len(fields))}
+            return jsonify({'success': True,
+                            'data': data})
+        else:
+            return jsonify({'success': False})
+    else:
+        # Unauthorized user
+        abort(401)
+
+
+@app.route(base_url + '/updateInsurerData/', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def update_insurer_data():
+    """
+    Update Insurer's data
+
+    :POST body:
+        {
+            'username': 'user',
+            'password': 'pw',
+            'fields': [
+                    'field 1',
+                        ...,
+                    'field n'
+                ],
+            'values': [
+                    'value 1',
+                        ...,
+                    'value n'
+                ]
+        }
+
+    :return:
+        JSON response
+        {
+            'success': Boolean,
+        }
+    """
+    request_body = request.get_json()
+    username = request_body['username']
+    password = request_body['password']
+    fields = request_body['fields']
+    values = request_body['values']
+
+    # Check if the fields are accessible
+    if not all([field in raw_data_fields for field in fields]):
+        # bad request
+        abort(400)
+
+    authentication = User().verify_password(password, username)
+
+    if authentication:
+        success = DataBase().update_db(insurerData,
                                        key={'username': username},
                                        field=fields,
                                        value=values)
