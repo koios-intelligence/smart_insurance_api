@@ -1,0 +1,1 @@
+# smart_insurance_api
