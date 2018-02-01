@@ -6,7 +6,7 @@ from lib.db import DataBase
 def check_pw(password):
     """
     Check whether the password
-    string entered is in accordance
+    string entered is in concordance
     with some specified standards
 
     :param password:
