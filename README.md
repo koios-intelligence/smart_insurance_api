@@ -9,7 +9,7 @@ virtualenv venv
 source venv/bin/activate
 
 # Install requirements 
-pip install -r requirements.txt # make sure pip is for Python 3
+pip install -r requirements.txt 
 
 # Start the app:
 python app.py
