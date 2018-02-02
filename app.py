@@ -13,6 +13,7 @@ basic_data_fields = config['variables']['basic_data_fields']
 raw_data_fields = config['variables']['raw_data_fields']
 insurer_data_fields = config['variables']['insurer_data_fields']
 
+productData = config['tables']['productData']
 insurerData = config['tables']['insurerData']
 rawUserData = config['tables']['rawUserData']
 basicUserData = config['tables']['basicUserData']
@@ -255,7 +256,7 @@ def get_insurer_data():
     """
     Fetch Insurer's data
     __________________________________________________
-    POST request example:
+    GET request example:
     curl -H "Content-Type: application/json" -X GET -d
     '{"username": "test", "password": "test", "fields":
     ["middle_name"], "values":["J."]}'
@@ -266,6 +267,7 @@ def get_insurer_data():
         {
             'username': 'user',
             'password': 'pw',
+            'insurer_id': 'id',
             'fields': [
                     'field 1',
                         ...,
@@ -287,6 +289,7 @@ def get_insurer_data():
     request_body = request.get_json()
     username = request_body['username']
     password = request_body['password']
+    insurer_id = request_body['insurer_id']
     fields = request_body['fields']
 
     # Check if the fields are accessible
@@ -298,7 +301,7 @@ def get_insurer_data():
 
     if authentication:
         fetched_data = DataBase().find(insurerData,
-                                       key={'username': username})
+                                       key={'insurer_id': insurer_id})
         if fetched_data is not None:
             data = {fields[i]: fetched_data[fields[i]]
                     for i in range(len(fields))}
@@ -321,6 +324,7 @@ def update_insurer_data():
         {
             'username': 'user',
             'password': 'pw',
+            'insurer_id': 'test',
             'fields': [
                     'field 1',
                         ...,
@@ -342,6 +346,7 @@ def update_insurer_data():
     request_body = request.get_json()
     username = request_body['username']
     password = request_body['password']
+    insurer_id = request_body['insurer_id']
     fields = request_body['fields']
     values = request_body['values']
 
@@ -354,11 +359,75 @@ def update_insurer_data():
 
     if authentication:
         success = DataBase().update_db(insurerData,
-                                       key={'username': username},
+                                       key={'insurer_id': insurer_id},
                                        field=fields,
                                        value=values)
         return jsonify({'success': success})
 
+    else:
+        # Unauthorized user
+        abort(401)
+
+
+@app.route(base_url + '/getProductData/', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def get_product_data():
+    """
+    Fetch Product's data
+    __________________________________________________
+    GET request example:
+    curl -H "Content-Type: application/json" -X GET -d
+    '{"username": "test", "password": "test",
+    "product_id": "test", "fields": ["middle_name"]}'
+    http://localhost:5000/api/v1.0/getProductData/
+    ___________________________________________________
+
+    :GET body:
+        {
+            'username': 'user',
+            'password': 'pw',
+            'product_id': 'id',
+            'fields': [
+                    'field 1',
+                        ...,
+                    'field n'
+                ]
+        }
+
+    :return:
+        JSON response
+        {
+            'success': Boolean,
+            'data': [
+                'field 1': 'value 1',
+                        ...,
+                'field n': 'value n'
+            ]
+        }
+    """
+    request_body = request.get_json()
+    username = request_body['username']
+    password = request_body['password']
+    product_id = request_body['product_id']
+    fields = request_body['fields']
+
+    # Check if the fields are accessible
+    if not all([field in insurer_data_fields for field in fields]):
+        # bad request
+        abort(400)
+
+    authentication = User().verify_password(password, username)
+
+    if authentication:
+        fetched_data = DataBase().find(productData,
+                                       key={'product_id': product_id})
+        if fetched_data is not None:
+            data = {fields[i]: fetched_data[fields[i]]
+                    for i in range(len(fields))}
+            return jsonify({'success': True,
+                            'data': data})
+        else:
+            return jsonify({'success': False})
     else:
         # Unauthorized user
         abort(401)
