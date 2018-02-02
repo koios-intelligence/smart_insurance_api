@@ -7,7 +7,8 @@
   "tables": {
     "basicUserData": "basicUserData",
     "rawUserData": "rawUserData",
-    "insurerData": "insurerData"
+    "insurerData": "insurerData",
+    "productData": "productData"
   },
   "variables": {
     "basic_data_fields": [
@@ -18,7 +19,13 @@
       "currency"
     ],
     "insurer_data_fields": [
-      "insurer_name", "insurer_id", "products"
+      "insurer_name", "insurer_id", "products", "insurer_desc",
+      "insurer_rating"
+    ],
+    "product_data_fields": [
+      "product_name", "product_id", "product_rating",
+      "pricing_method", "pricing_method_id", "pricing_method_data",
+      "monetary_attr", "qualitative_attr", "product_desc", "insurer"
     ],
     "raw_data_fields": ["username"],
     "normalized_data_fields": ["username"]
